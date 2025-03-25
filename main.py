@@ -8,7 +8,7 @@ from paddle.profiler import Profiler, ProfilerTarget
 from datetime import datetime
 import paddle.distributed as dist
 from graduation.utils import printf
-from graduation.pipeline_specific_wrap_new import SpecificModel, PipelineModel
+from graduation.pipeline_specific_wrap_new import SpecificModel, PipelineModel, pp4layer16Model
 
 def train(args):
     dist.init_parallel_env()
@@ -24,7 +24,7 @@ def train(args):
         "dp_degree": args.dp_degree,
         "mp_degree": args.mp_degree,
         "pp_degree": args.pp_degree,
-        # "pp_configs": {"profiling": True, "enable_timer": True},
+        "pp_configs": {"profiling": True, "enable_timer": True},
     }
     local_batch_size = args.global_batch_size  # [note] check the local batch size correct or wrong
     strategy.pipeline_configs = {
@@ -42,7 +42,7 @@ def train(args):
     fleet.init(is_collective=True, strategy=strategy)
     hcg = fleet.get_hybrid_communicate_group()
     config = config_init(args)
-    pipeline_model = SpecificModel(config=config, num_stages=args.pp_degree, topology=hcg._topo)
+    pipeline_model = pp4layer16Model(config=config, num_stages=args.pp_degree, topology=hcg._topo)
     model = fleet.distributed_model(pipeline_model)    
     optimizer = paddle.optimizer.Adam(parameters=model.parameters(), learning_rate=1e-4, weight_decay=0.01)  # [note] 加上了multi_precision之后 时间会更长
     optimizer = fleet.distributed_optimizer(optimizer, strategy=strategy)
@@ -65,7 +65,7 @@ def train(args):
     paddle_end_event = paddle.device.Event(enable_timing=True)
     for epoch in range(args.num_epochs):
         iter_times.clear()
-        with Profiler(targets=[ProfilerTarget.CPU, ProfilerTarget.GPU], scheduler=(1, 10)) as prof:
+        with Profiler(targets=[ProfilerTarget.CPU, ProfilerTarget.GPU], scheduler=(10, 14)) as prof:
             for batch_idx, (input, label) in enumerate(dataloader):
                 if batch_idx >= args.iter_upper_limit:
                     print("Early stop.")
@@ -97,7 +97,7 @@ def train(args):
                 
                 paddle.distributed.barrier() 
             
-            prof.export(f"./profile_files/paddle_trace_{paddle.distributed.get_rank()}_{current_time}.json", format="json")
+            prof.export(f"./profile_files/paddle_trace_{paddle.distributed.get_rank()}_pp{args.pp_degree}layer{args.num_hidden_layers}gbsz{args.global_batch_size}mbsz{args.micro_batch_size}seqlen{args.seq_length}.json", format="json")
         
         iter_times = iter_times[1:] if iter_times else [] # remove the first item
         total_time = sum(iter_times) if iter_times else 0 
