@@ -1,7 +1,18 @@
 import paddle
 import argparse
+import builtins
 import numpy as np
 
+original_print = builtins.print
+
+def print(*args, prefix="[graduation]", use_color=False, **kwargs):
+    if use_color:
+        color = "\033[92m"  # Green
+        reset_color = "\033[0m"
+        original_print(f"{color}{prefix}", *args, reset_color, **kwargs)
+    else:
+        original_print(prefix, *args, **kwargs)
+        
 def printf(string):
     prefix_string = "[DEBUG]: "
     print(prefix_string + string)

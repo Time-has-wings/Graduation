@@ -5,7 +5,7 @@ export PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True"
 # LAUNCHER="python3 -m paddle.distributed.launch --gpus 0,1,2,3,4,5,6,7"
 LAUNCHER="python3 -m paddle.distributed.launch --gpus 0,1,2,3"
 
-TRAINER="main.py"
+TRAINER="./parallelism/pure_pipeline.py"
 
 # set all configurations
 PARSER_ARGS="
