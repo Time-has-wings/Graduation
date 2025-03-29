@@ -24,7 +24,7 @@ def train(args):
         "dp_degree": args.dp_degree,
         "mp_degree": args.mp_degree,
         "pp_degree": args.pp_degree,
-        "pp_configs": {"profiling": True, "enable_timer": True},
+        # "pp_configs": {"profiling": True, "enable_timer": True},
     }
     local_batch_size = args.global_batch_size  # [note] check the local batch size correct or wrong
     strategy.pipeline_configs = {
@@ -73,7 +73,7 @@ def train(args):
                 
                 # print(f'rank {paddle.distributed.get_rank()}, device {input.place}')
                 
-                print(f"Batch {batch_idx}, Memory Allocated: {paddle.device.cuda.memory_allocated() / 1024**3:.2f} GB, Reserved: {paddle.device.cuda.memory_reserved() / 1024**3:.2f} GB")
+                # print(f"Batch {batch_idx}, Memory Allocated: {paddle.device.cuda.memory_allocated() / 1024**3:.2f} GB, Reserved: {paddle.device.cuda.memory_reserved() / 1024**3:.2f} GB")
                 
                 paddle.device.synchronize()
                 paddle_start_event.record()
@@ -81,8 +81,8 @@ def train(args):
                 # with paddle.amp.auto_cast( enable=True, dtype='bfloat16', level='O2' ):
                 loss = model.train_batch(data=[input, label], optimizer=optimizer, scaler=scaler)
                 
-                paddle_end_event.record()
                 paddle.device.synchronize()
+                paddle_end_event.record()
                 
                 prof.step()
                 
