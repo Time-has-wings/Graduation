@@ -40,4 +40,6 @@ def parse_args():
     parser.add_argument('--pp_degree', type=int, default=1, help='Pipeline parallel degree')
     parser.add_argument('--mixed_precision', type=str, default='fp32', help='Mixed precision')
     parser.add_argument('--micro_batch_size', type=int, default=1, help='Micro batch size')
+    parser.add_argument('--acc_step', type=int, default=8, help='Accumulation step')
+    
     return parser.parse_args()

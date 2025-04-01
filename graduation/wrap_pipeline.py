@@ -10,7 +10,7 @@ class ModelChunk(nn.Layer):
         self.layers = []
         for layer_name in layer_name_list:
             if layer_name == 'embedding':
-                self.embedding = nn.Embedding(config.vocab_size, config.hidden_size)
+                self.layers.append(nn.Embedding(config.vocab_size, config.hidden_size))
             elif layer_name.startswith('decoder'):
                 self.layers.append(LlamaDecoderLayer(config))
             elif layer_name == 'norm':

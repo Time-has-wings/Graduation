@@ -10,7 +10,7 @@ class DummyDataset(Dataset):
         self.generate_dummy_data()
     
     def generate_dummy_data(self):
-        self.dataset_size = 2560 * 8  # 暂且临时设置为2560 * 8
+        self.dataset_size = 512 * 20  # 暂且临时设置为512 * 20
         self.input_list = []
         self.label_list = []
         
