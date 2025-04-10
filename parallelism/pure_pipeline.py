@@ -46,7 +46,7 @@ def train(args):
     print(model, use_color=True)  
     
     # init optimizer 
-    optimizer = paddle.optimizer.Adam(parameters=model.parameters(), learning_rate=1e-4, weight_decay=0.01)  # [note] 加上了multi_precision之后 时间会更长
+    optimizer = paddle.optimizer.Adam(parameters=model.parameters(), learning_rate=1e-4, weight_decay=0.01, multi_precision=True)  # [note] 加上了multi_precision之后 时间会更长
     optimizer = fleet.distributed_optimizer(optimizer, strategy=strategy)
     
     # Create AMP scaler
@@ -58,7 +58,7 @@ def train(args):
     
     # set dataloader
     dataset = DummyDataset(vocab_size=args.vocab_size, seq_length=args.seq_length)
-    sampler = DistributedBatchSampler(dataset, batch_size=local_batch_size, num_replicas=1, rank=0, shuffle=True)
+    sampler = DistributedBatchSampler(dataset, batch_size=local_batch_size, num_replicas=args.dp_degree, rank=0, shuffle=True)
     dataloader = DataLoader(dataset, batch_sampler=sampler) 
         
     # start training

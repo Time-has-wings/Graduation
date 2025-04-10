@@ -18,12 +18,6 @@ def train(args):
         "dp_degree": args.dp_degree,
         "mp_degree": args.mp_degree,
         "pp_degree": args.pp_degree,
-        "sharding_degree" : args.sharding_degree,
-        "sharding_stage": args.sharding_stage,
-        "sharding_offload": args.sharding_offload,
-        "sharding_offload_param": args.sharding_offload_param,
-        "sharding_offload_optim": args.sharding_offload_optim,
-        "sharding_offload_param_config": args.sharding_offload_param_config,
     }
     strategy.amp = True
     strategy.amp_configs = {

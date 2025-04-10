@@ -27,11 +27,15 @@ def config_init(args):
                        max_position_embeddings=max_position_embeddings,
                        rms_norm_eps=rms_norm_eps,
                        seq_length=seq_length,
-                       tensor_parallel_degree=args.mp_degree, # [confused] 这两行代码貌似相当重要
+                       tensor_parallel_degree=args.mp_degree,
                        tensor_parallel_rank=rank,
+                       tensor_parallel_output=True,
                        use_flash_attention=True,)
     print(f'>>>> config is \n {config}')
     return config
+
+def arg_to_config(args) -> LlamaConfig:
+    pass
 
 def model_init(config):
     model = LlamaForCausalLM(config)

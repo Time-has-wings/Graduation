@@ -7,3 +7,4 @@
 profile_record*
 __pycache__
 /nsys
+/parallel_model_learning

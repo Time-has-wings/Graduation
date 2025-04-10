@@ -46,7 +46,7 @@ def parse_args():
     
     return parser.parse_args()
 
-def generate_llama_config(args, hcg:HybridCommunicateGroup) -> LlamaConfig:
+def generate_llama_config(args, hcg:HybridCommunicateGroup):
     config = {}
     
     # generate from args directly
@@ -62,32 +62,24 @@ def generate_llama_config(args, hcg:HybridCommunicateGroup) -> LlamaConfig:
     config['intermediate_size'] = 11008 if args.mp_degree != 1 or args.pp_degree != 1 else args.hidden_size * 8 // 3
     
     # set default values
-    config['use_flash_attention'] = True
-    config['fuse_attention_qkv'] = True
-    config['fuse_attention_ffn'] = True
-    config['use_fused_rope'] = True
+    # config['use_flash_attention'] = True # [note] 该函数的真实作用在哪？ 其实是没有实际作用的,不会开启attn
     
     # tensor parallel
     if args.mp_degree != 1:
         config['tensor_parallel_degree'] = args.mp_degree
         config['tensor_parallel_rank'] = hcg.get_model_parallel_rank()
         config['tensor_parallel_output'] = True
-        config['sequence_parallel'] = True
 
     # print config
     print(f'config dict: {config}')
     
     # generate LlamaConfig
-    llama_config = LlamaConfig(**config)
+    llama_config = LlamaConfig(use_flash_attention=True, **config)
     print(f"llama_config : {llama_config}")
     return llama_config
     
 def print_model_and_size(model:paddle.nn.Layer):
     print(f"Model: {model}")
-    num_params = sum(p.numel() for p in model.parameters())
-    print(f"Number of parameters: {num_params}")
-    
-def print_size(model:paddle.nn.Layer):
     num_params = sum(p.numel() for p in model.parameters())
     print(f"Number of parameters: {num_params}")
     
